@@ -140,13 +140,13 @@ void sil(struct ikili_arama_agaci *agac, int silinen) {
         } else break;
     }
     if (d == NULL) return;
-    if (d->sol == NULL) { // silinen dugumun solu bos
+    if (d->sol == NULL) {               // silinen dugumun solu bos
         if (parent == NULL) agac->kok = d->sag;
         else {
             if (sol == 1) parent->sol = d->sag;
             else parent->sag = d->sag;
         }
-    } else if (d->sag == NULL) { // silinen dugumun sagi bos
+    } else if (d->sag == NULL) {        // silinen dugumun sagi bos
         if (parent == NULL) agac->kok = d->sol;
         else {
             if (sol == 1) parent->sol = d->sol;
@@ -175,8 +175,8 @@ void sil(struct ikili_arama_agaci *agac, int silinen) {
            } */
 
     else {      // silinen dugumun hem sagi hem de solu dolu
-        // silinencek dugumun saginin en soluna git
-        // en soldaki dugum silinen dugumun konumunu alir
+                // silinencek dugumun saginin en soluna git
+                // en soldaki dugum silinen dugumun konumunu alir
         d1 = d->sag;
         d2 = NULL;
         while (d1->sol != NULL) {
@@ -188,7 +188,7 @@ void sil(struct ikili_arama_agaci *agac, int silinen) {
             d1->sag = d->sag;
         }
         d1->sol = d->sol;
-        if (parent == NULL) agac->kok = d1; // agacin koku degisti
+        if (parent == NULL) agac->kok = d1;     // agacin koku degisti
         else {
             if (sol == 1) parent->sol = d1;
             else parent->sag = d1;
