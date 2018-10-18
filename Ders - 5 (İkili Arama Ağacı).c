@@ -110,6 +110,12 @@ int dugum_sayisi(struct dugum *kok) {
     return 1 + dugum_sayisi(kok->sol) + dugum_sayisi(kok->sag);
 }
 
+int ic_dugum_sayisi(struct dugum *kok) {
+    if (kok == NULL) return 0;
+    if (kok->sol == NULL && kok->sag == NULL) return 0;
+    else return 1 + ic_dugum_sayisi(kok->sol) + ic_dugum_sayisi(kok->sag);
+}
+
 int yaprak_sayisi(struct dugum *kok) {
     if (kok == NULL) return 0;
     if (kok->sol == NULL && kok->sag == NULL) return 1;
@@ -228,9 +234,15 @@ int main(int argc, char **argv) {
     ekle(agac, 375);
     ekle(agac, 30);
     ekle(agac, 173);
-    inorder(agac);
-    preorder(agac);
+    printf("iç düğüm sayısı:");
+    printf(" %d", ic_dugum_sayisi(agac->kok));
 
+    printf("inorder sıralama:");
+    inorder(agac);
+    printf("preorder sıralama:");
+    preorder(agac);
+    printf("postorder sıralama:");
+    postorder(agac);
     //  printf("Ic dugum sayisi: %4d\n",foo(agac->kok));
 
     return 0;
