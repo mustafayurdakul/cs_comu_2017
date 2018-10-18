@@ -153,9 +153,9 @@ void sil(struct ikili_arama_agaci *agac, int silinen) {
             else parent->sag = d->sol;
         }
     }
-        /*  else { // silinen dugumun hem sagi hem de solu dolu
-                 // silinencek dugumun solunun en sagina git
-                 // en sagdaki dugum silinen dugumun konumunu alir
+        /*  else {      // silinen dugumun hem sagi hem de solu dolu
+                        // silinencek dugumun solunun en sagina git
+                        // en sagdaki dugum silinen dugumun konumunu alir
               d1=d->sol;
               d2=NULL;
               while(d1->sag!=NULL){
@@ -174,7 +174,7 @@ void sil(struct ikili_arama_agaci *agac, int silinen) {
               }
            } */
 
-    else { // silinen dugumun hem sagi hem de solu dolu
+    else {      // silinen dugumun hem sagi hem de solu dolu
         // silinencek dugumun saginin en soluna git
         // en soldaki dugum silinen dugumun konumunu alir
         d1 = d->sag;
@@ -207,7 +207,7 @@ void yoket(struct dugum **kok) {
 }
 
 
-int foo(struct dugum *kok) { // ic dugum sayisi
+int foo(struct dugum *kok) { // İç düğüm sayısı
     if (kok == NULL) return 0;
     else if (kok->sol != NULL || kok->sag != NULL)
         return 1 + foo(kok->sol) + foo(kok->sag);
@@ -234,16 +234,17 @@ int main(int argc, char **argv) {
     ekle(agac, 375);
     ekle(agac, 30);
     ekle(agac, 173);
-    printf("iç düğüm sayısı:");
-    printf(" %d", ic_dugum_sayisi(agac->kok));
+
+    printf("iç düğüm sayısı: %d\n", ic_dugum_sayisi(agac->kok));
 
     printf("inorder sıralama:");
     inorder(agac);
+
     printf("preorder sıralama:");
     preorder(agac);
+
     printf("postorder sıralama:");
     postorder(agac);
-    //  printf("Ic dugum sayisi: %4d\n",foo(agac->kok));
 
     return 0;
 }
