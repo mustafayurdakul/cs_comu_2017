@@ -1,250 +1,249 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SENTINEL -100000000
-
-struct dugum {
-    int icerik;
-    struct dugum *sol;
-    struct dugum *sag;
+struct node {
+    int number;
+    struct node *left;
+    struct node *right;
 };
 
-struct ikili_arama_agaci {
-    struct dugum *kok;
+struct binary_search_tree {
+    struct node *root;
 };
 
-void ikili_arama_agaci_olustur(struct ikili_arama_agaci **agac) {
-    *agac = (struct ikili_arama_agaci *) malloc(sizeof(struct ikili_arama_agaci));
-    if (*agac == NULL) {
-        printf("Heapte gerekli yer ayrilamadi... exit ...\n");
+void create_binary_search_tree(struct binary_search_tree **tree) {
+    *tree = (struct binary_search_tree *) malloc(sizeof(struct binary_search_tree));
+    if (*tree == NULL) {
+        printf("We can't allocate space in heap for binary search tree.\n");
         exit(1);
     }
-    (*agac)->kok = NULL;
+    (*tree)->root = NULL;
 }
 
-int ikili_agac_bosmu(struct ikili_arama_agaci *agac) {
-    if (agac->kok == NULL) return 1;
-    else return 0;
+int is_it_empty(struct binary_search_tree *tree) {
+    if (tree->root == NULL) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
-struct dugum *dugum_olustur(int icerik) {
-    struct dugum *d = (struct dugum *) malloc(sizeof(struct dugum));
-    if (d == NULL) {
-        printf("Heapte gerekli yer ayrilamadi... exit ...\n");
+struct node *create_node(int number) {
+    struct node *a = (struct node *) malloc(sizeof(struct node));
+    if (a == NULL) {
+        printf("We can't allocate space in heap for binary search tree.\n");
         exit(1);
     }
-    d->icerik = icerik; //(*d).icerik=icerik;
-    d->sol = d->sag = NULL;
-    return d;
+    a->number = number;
+    a->left = NULL;
+    a->right = NULL;
 }
 
+void add(struct binary_search_tree *tree, int number) {
+    struct node *a = create_node(number);
+    struct node *root = tree->root;
+    struct node *back = NULL;
 
-void ekle(struct ikili_arama_agaci *agac, int icerik) {
-    struct dugum *dugum;
-    struct dugum *d;
-    struct dugum *geri;
-
-    d = agac->kok;
-    while (d != NULL) {
-        geri = d;
-        if (icerik < d->icerik) d = d->sol;
-        else if (icerik > d->icerik) d = d->sag;
-        else return;
+    while (root != NULL) {
+        back = root;
+        if (number < root->number) {
+            root = root->left;
+        } else if (number > root->number) {
+            root = root->right;
+        } else {
+            return;
+        }
     }
-    dugum = dugum_olustur(icerik);
-    if (agac->kok == NULL) {
-        agac->kok = dugum;
+
+    if (tree->root == NULL) {
+        tree->root = a;
+    } else if (number < back->number) {
+        back->left = a;
+    } else if (number > back->number) {
+        back->right = a;
+    }
+}
+
+void inorder_h(struct node *root) {
+    if (root == NULL) {
         return;
     }
-    if (icerik < geri->icerik) geri->sol = dugum;
-    else geri->sag = dugum;
-
+    inorder_h(root->left);
+    printf("%d   ", root->number);
+    inorder_h(root->right);
 }
 
-void inorder_yardimci(struct dugum *kok) {
-
-    if (kok == NULL) return;
-    inorder_yardimci(kok->sol);
-    printf("%4d ", kok->icerik);
-    inorder_yardimci(kok->sag);
-
-}
-
-void inorder(struct ikili_arama_agaci *agac) {
-    if (agac == NULL) return;
-    inorder_yardimci(agac->kok);
-    printf("\n");
-}
-
-void preorder_yardimci(struct dugum *kok) {
-
-    if (kok == NULL) return;
-    printf("%4d ", kok->icerik);
-    preorder_yardimci(kok->sol);
-    preorder_yardimci(kok->sag);
-
-}
-
-void preorder(struct ikili_arama_agaci *agac) {
-    if (agac == NULL) return;
-    preorder_yardimci(agac->kok);
-    printf("\n");
-}
-
-void postorder_yardimci(struct dugum *kok) {
-    if (kok == NULL) return;
-    postorder_yardimci(kok->sol);
-    postorder_yardimci(kok->sag);
-    printf("%4d ", kok->icerik);
-
-}
-
-void postorder(struct ikili_arama_agaci *agac) {
-    if (agac == NULL) return;
-    postorder_yardimci(agac->kok);
-    printf("\n");
-}
-
-int dugum_sayisi(struct dugum *kok) {
-    if (kok == NULL) return 0;
-    return 1 + dugum_sayisi(kok->sol) + dugum_sayisi(kok->sag);
-}
-
-int ic_dugum_sayisi(struct dugum *kok) {
-    if (kok == NULL) return 0;
-    if (kok->sol == NULL && kok->sag == NULL) return 0;
-    else return 1 + ic_dugum_sayisi(kok->sol) + ic_dugum_sayisi(kok->sag);
-}
-
-int yaprak_sayisi(struct dugum *kok) {
-    if (kok == NULL) return 0;
-    if (kok->sol == NULL && kok->sag == NULL) return 1;
-    else return yaprak_sayisi(kok->sol) + yaprak_sayisi(kok->sag);
-}
-
-void sil(struct ikili_arama_agaci *agac, int silinen) {
-
-    struct dugum *d = agac->kok;
-    struct dugum *parent = NULL;
-    struct dugum *d1, *d2;
-    int sol;
-    while (d != NULL) {
-        if (silinen < d->icerik) {
-            parent = d;
-            d = d->sol;
-            sol = 1;
-        } else if (silinen > d->icerik) {
-            parent = d;
-            d = d->sag;
-            sol = 0;
-        } else break;
+void inorder(struct binary_search_tree *tree) {
+    printf("Inorder: ");
+    if (tree == NULL) {
+        return;
     }
-    if (d == NULL) return;
-    if (d->sol == NULL) {               // silinen dugumun solu bos
-        if (parent == NULL) agac->kok = d->sag;
-        else {
-            if (sol == 1) parent->sol = d->sag;
-            else parent->sag = d->sag;
-        }
-    } else if (d->sag == NULL) {        // silinen dugumun sagi bos
-        if (parent == NULL) agac->kok = d->sol;
-        else {
-            if (sol == 1) parent->sol = d->sol;
-            else parent->sag = d->sol;
+    inorder_h(tree->root);
+    printf("\n");
+}
+
+void preorder_h(struct node *root) {
+    if (root == NULL) {
+        return;
+    }
+    printf("%d   ", root->number);
+    preorder_h(root->left);
+    preorder_h(root->right);
+}
+
+void preorder(struct binary_search_tree *tree) {
+    printf("Preorder: ");
+    if (tree == NULL) {
+        return;
+    }
+    preorder_h(tree->root);
+    printf("\n");
+
+}
+
+void postorder_h(struct node *root) {
+    if (root == NULL) {
+        return;
+    }
+    postorder_h(root->left);
+    postorder_h(root->right);
+    printf("%d   ", root->number);
+}
+
+void postorder(struct binary_search_tree *tree) {
+    printf("Postorder: ");
+    if (tree == NULL) {
+        return;
+    }
+    postorder_h(tree->root);
+    printf("\n");
+}
+
+int node_counter(struct node *root) {
+
+    if (root == NULL) {
+        return 0;
+    } else {
+        return 1 + node_counter(root->left) + node_counter(root->right);
+    }
+}
+
+int node_counter_not_leaf(struct node *root) {
+    if (root == NULL) {
+        return 0;
+    } else if (root->left == NULL && root->right == NULL) {
+        return 0;
+    } else {
+        return 1 + node_counter_not_leaf(root->left) + node_counter_not_leaf(root->right);
+    }
+}
+
+int leaf_counter(struct node *root) {
+
+    if (root == NULL) {
+        return 0;
+    } else if (root->left == NULL && root->right == NULL) {
+        return 1;
+    } else {
+        return leaf_counter(root->left) + leaf_counter(root->right);
+    }
+}
+
+void delete(struct binary_search_tree *tree, int number) {
+    struct node *root = tree->root;
+    struct node *parent = NULL;
+    struct node *d1, *d2;
+    int left = 0;
+    while (root != NULL) {
+        if (number < root->number) {
+            parent = root;
+            root = root->left;
+            left = 1;
+        } else if (number > root->number) {
+            parent = root;
+            root = root->right;
+            left = 0;
+        } else {
+            break;
         }
     }
-        /*  else {      // silinen dugumun hem sagi hem de solu dolu
-                        // silinencek dugumun solunun en sagina git
-                        // en sagdaki dugum silinen dugumun konumunu alir
-              d1=d->sol;
-              d2=NULL;
-              while(d1->sag!=NULL){
-                  d2=d1;
-                  d1=d1->sag;
-              }
-              if(d2!=NULL){
-                  d2->sag= d1->sol;
-                  d1->sol=d->sol;
-              }
-              d1->sag = d->sag;
-              if(parent==NULL) agac->kok=d1; // agacin koku degisti
-              else {
-                  if(sol==1) parent->sol=d1;
-                  else parent->sag=d1;
-              }
-           } */
-
-    else {      // silinen dugumun hem sagi hem de solu dolu
-                // silinencek dugumun saginin en soluna git
-                // en soldaki dugum silinen dugumun konumunu alir
-        d1 = d->sag;
+    if (root == NULL) {                         //Düğüm boş ise.
+        return;
+    } else if (root->left == NULL) {            //Silinen düğümün solu boş ise.
+        if (parent == NULL) {
+            return;
+        } else {
+            if (left == 1) {
+                parent->left = root->right;
+            } else {
+                parent->right = root->right;
+            }
+        }
+    } else if (root->right == NULL) {           //Silinen düğümün sağı boş ise.
+        if (parent == NULL) {
+            return;
+        } else {
+            if (left == 1) {
+                parent->left = root->left;
+            } else {
+                parent->right = root->left;
+            }
+        }
+    } else {                                    //Silinen düğümün her iki tarafı da dolu ise.
+        d1 = root->right;
         d2 = NULL;
-        while (d1->sol != NULL) {
-            d2 = d1;
-            d1 = d1->sol;
+        while (d1->left == NULL) {              //Silinen düğümün sağının en soluna git.
+            d2 = d1;                            //En sondaki düğüm silinen düğümün konumunu alır.
+            d1 = d1->left;
         }
         if (d2 != NULL) {
-            d2->sol = d1->sag;
-            d1->sag = d->sag;
+            d2->left = d1->right;
+            d1->right = root->right;
         }
-        d1->sol = d->sol;
-        if (parent == NULL) agac->kok = d1;     // agacin koku degisti
-        else {
-            if (sol == 1) parent->sol = d1;
-            else parent->sag = d1;
-        }
-    }
-    free(d);
-}
 
-void yoket(struct dugum **kok) {
-    if (*kok != NULL) {
-        yoket(&(*kok)->sol);
-        yoket(&(*kok)->sag);
-        free(*kok);
-        *kok = NULL;
+        d1->left = root->right;
+        if (parent == NULL) {
+            tree->root = d1;
+        } else {
+            if (left == 1) {
+                parent->left = d1;
+            } else {
+                parent->right = d1;
+            }
+        }
     }
 }
 
-
-int foo(struct dugum *kok) { // İç düğüm sayısı
-    if (kok == NULL) return 0;
-    else if (kok->sol != NULL || kok->sag != NULL)
-        return 1 + foo(kok->sol) + foo(kok->sag);
-    else return 0;
+void erase_binary_search_tree(struct node **root) {
+    if (root != NULL) {
+        erase_binary_search_tree(&(*root)->left);
+        erase_binary_search_tree(&(*root)->right);
+        free(*root);
+    }
 }
 
-int main(int argc, char **argv) {
-    struct ikili_arama_agaci *agac = NULL;
-    ikili_arama_agaci_olustur(&agac);
+int main() {
+    struct binary_search_tree *tree = NULL;
+    create_binary_search_tree(&tree);
+    add(tree, 200);
+    add(tree, 25);
+    add(tree, 75);
+    add(tree, 20);
+    add(tree, 35);
+    add(tree, 98);
+    add(tree, 99);
+    add(tree, 500);
+    add(tree, 400);
+    add(tree, 300);
+    add(tree, 210);
+    add(tree, 375);
+    add(tree, 30);
+    add(tree, 173);
+    erase_binary_search_tree(&tree->root);
+    inorder(tree);
+    preorder(tree);
+    postorder(tree);
+    printf("Node Counter Not Leafs: %d\n", node_counter_not_leaf(tree->root));
+    printf("Leaf Counter: %d\n", leaf_counter(tree->root));
 
-    ekle(agac, 100);
-    ekle(agac, 50);
-    ekle(agac, 200);
-    ekle(agac, 25);
-    ekle(agac, 75);
-    ekle(agac, 20);
-    ekle(agac, 35);
-    ekle(agac, 98);
-    ekle(agac, 99);
-    ekle(agac, 500);
-    ekle(agac, 400);
-    ekle(agac, 300);
-    ekle(agac, 210);
-    ekle(agac, 375);
-    ekle(agac, 30);
-    ekle(agac, 173);
-
-    printf("iç düğüm sayısı: %d\n", ic_dugum_sayisi(agac->kok));
-
-    printf("inorder sıralama:");
-    inorder(agac);
-
-    printf("preorder sıralama:");
-    preorder(agac);
-
-    printf("postorder sıralama:");
-    postorder(agac);
-
-    return 0;
 }
