@@ -1,119 +1,111 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SENTINEL -10000000
+#define SENTINEL -1000000
 
-struct yigin {
-        int *dizi;
-        int ust;
-        int kapasite;
+struct stack {
+    int *array;
+    int up;
+    int size;
 };
 
-struct yigin* yigin_olustur(int kapasite){
-        if(kapasite<=0) {
-                printf("Kapasite pozitif bir tam sayi olmali... ");
-                exit(1);
-        }
-        struct yigin *ptr=(struct yigin*)malloc(sizeof(struct yigin));
-        ptr->dizi=(int *)malloc(kapasite*sizeof(int));
-        ptr->ust=-1;
-        ptr->kapasite= kapasite;
-        return ptr;
+struct stack *create_stack(int size) {
+    if (size <= 0) {
+        printf("Please select a valid size.");
+        exit(1);
+    }
+    struct stack *ptr = (struct stack *) malloc(sizeof(struct stack));
+    ptr->array = (int *) malloc(sizeof(int) * size);
+    ptr->up = -1;
+    ptr->size = size;
+    return ptr;
 }
 
-void yigin_olustur_parametre_ile(int kapasite, struct yigin **y){
-        if(kapasite<=0) {
-                printf("Kapasite pozitif bir tam sayi olmali... ");
-                exit(1);
-        }
-        *y=(struct yigin*)malloc(sizeof(struct yigin));
-        (*y)->dizi=(int *)malloc(kapasite*sizeof(int));
-        (*y)->ust=-1;
-        (*y)->kapasite=kapasite;
+void create_stack_with_parameter(int size, struct stack **y) {
+    if (size <= 0) {
+        printf("Please select a valid size.");
+        exit(1);
+    }
+    *y = (struct stack *) malloc(sizeof(struct stack));
+    (*y)->array = (int *) malloc(sizeof(int) * size);
+    (*y)->up = -1;
+    (*y)->size = size;
 }
 
-int yigin_bosmu(struct yigin *y){
-        if(y->ust==-1) return 1;
-        else return 0;
-}
-int yigin_dolumu(struct yigin *y){
-        if(y->ust==y->kapasite-1) return 1;
-        else return 0;
-}
-
-void yigin_ekle(int eleman, struct yigin *y){
-        if(yigin_dolumu(y)) {
-                printf("Yigin dolu, ekleme yapilamiyor...");
-                return;
-        }
-        y->dizi[++y->ust]=eleman;
-
+int is_stack_empty(struct stack *y) {
+    if (y->up == -1) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
-void yigin_yaz(struct yigin *y){
-        int i;
-        printf("Yigin Kapasitesi       :%4d\n",y->kapasite);
-        printf("Yigindaki Eleman Sayisi:%4d\n",y->ust+1);
-        for(i=y->ust; i>=0; i--) {
-                printf("%4d ",y->dizi[i]);
-        }
-        printf("\n");
+int is_stack_full(struct stack *y) {
+    if (y->up == y->size - 1) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
-int yigin_eleman_sil(struct yigin *y){
-        if(yigin_bosmu(y)) return SENTINEL;
-        return y->dizi[y->ust--];
-
-
+void add_to_stack(int number, struct stack *y) {
+    if (is_stack_full(y)) {
+        printf("Stack is full, exiting.");
+        exit(1);
+    } else {
+        y->array[++y->up] = number;
+    }
 }
 
-void yigin_yok_et(struct yigin **y){
-        free((*y)->dizi);
-        free(*y);
-        *y=NULL;
+void print_stack(struct stack *y) {
+    printf("Stack size: %d \n", y->size);
+    printf("Number of elements: %d \n", y->up + 1);
+    for (int i = y->up; i >= 0; i--) {
+        printf("%4d", y->array[i]);
+    }
+    printf("\n");
 }
 
-struct yigin *kapasiteyi_artir(struct yigin **ptr, int kackat){
-        struct yigin *yeni;
-        int i;
-        yeni=yigin_olustur(kackat*((*ptr)->kapasite));
-        for(i=0; i<=(*ptr)->ust; i++) yeni->dizi[i]=(*ptr)->dizi[i];
-        yeni->ust=(*ptr)->ust;
-        yigin_yok_et(&(*ptr)); // yigin_yok_et(ptr);
-        return yeni;
+int delete_on_stack(struct stack *y) {
+    if (is_stack_empty(y)) {
+        return SENTINEL;
+    } else {
+        return y->array[y->up--];
+    }
 }
 
-void kapasiteyi_artir_yeni(struct yigin **ptr, int kackat){
-        struct yigin *yeni;
-        int i;
-        yeni=yigin_olustur(kackat*((*ptr)->kapasite));
-        for(i=0; i<=(*ptr)->ust; i++) yeni->dizi[i]=(*ptr)->dizi[i];
-        yeni->ust=(*ptr)->ust;
-        yigin_yok_et(&(*ptr)); // yigin_yok_et(ptr);
-        *ptr=yeni;
+void erase_stack(struct stack **y) {
+    free((*y)->array);
+    free((*y));
+    *y = NULL;
 }
 
+void increase_stack_size(struct stack **ptr, int multiply) {
+    struct stack *new;
+    new = create_stack(multiply * ((*ptr)->size));
+    for (int i = 0; i <= (*ptr)->up; i++) {
+        new->array[i] = (*ptr)->array[i];
+    }
+    new->up = (*ptr)->up;
+    erase_stack(ptr);
+    *ptr = new;
+}
 
-int main(int argc, char** argv) {
-        struct yigin *A=NULL;
-        struct yigin *B=NULL;
-        int silinen;
-        A=yigin_olustur(10);
-        // yigin_olustur_parametre_ile(10,&A);
-        yigin_ekle(12,A);
-        yigin_ekle(56,A);
-        yigin_ekle(-20,A);
-        yigin_yaz(A);
+int main() {
+    struct stack *A = NULL;
+    struct stack *B = NULL;
+    A = create_stack(10);
+    /* Parametre ile yığın oluştuma:
+     * create_stack_with_parameter(10, &A); */
+    add_to_stack(12, A);
+    add_to_stack(56, A);
+    add_to_stack(-20, A);
+    print_stack(A);
 
-        silinen=yigin_eleman_sil(A);
-        printf("Silinen: %4d\n",silinen);
-        yigin_yaz(A);
+    int deleted = delete_on_stack(A);
+    printf("Deleted: %d \n", deleted);
+    print_stack(A);
 
-        yigin_ekle(100,A);
-        yigin_yaz(A);
-
-        kapasiteyi_artir_yeni(&A,3);
-        yigin_yaz(A);
-
-        return (EXIT_SUCCESS);
+    increase_stack_size(&A, 3);
+    print_stack(A);
 }
